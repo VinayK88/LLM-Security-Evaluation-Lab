@@ -323,7 +323,7 @@ Returns failed checks with explanations.
 - OWASP LLM Top 10 mapping
 - MITRE ATLAS mapping
 
-## Example interview pitch
+## Example project pitch
 
 > "I built an LLM security evaluation framework that treats agent safety as a measurable system property rather than a one-time red-team exercise. Each scenario records the user prompt, untrusted context, authorized tools, approval requirements, protected values, and the agent's complete response trace. Independent graders then score prompt-injection resistance, data leakage, hallucination, tool authorization, and human-approval compliance. That makes it possible to compare model versions, detect regressions in CI, and define release gates for enterprise AI systems."
 
@@ -346,8 +346,7 @@ llm-security-evaluation/
 │   ├── test_engine.py
 │   └── test_graders.py
 ├── docs/
-│   ├── architecture.md
-│   └── interview-walkthrough.md
+│   └── architecture.md
 ├── Dockerfile
 ├── requirements.txt
 ├── SECURITY.md
