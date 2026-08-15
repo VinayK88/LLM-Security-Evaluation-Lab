@@ -23,6 +23,16 @@ A defensive, reproducible evaluation framework for LLM and agentic applications.
 
 The default benchmark uses **synthetic scenarios** and **deterministic mock adapters**, so it runs without API keys, network access, or real secrets. The deliberately unsafe adapter provides a known-bad baseline that proves the graders can detect failures.
 
+## 60-second reviewer path
+
+Short on time? Review the project in this order:
+
+1. [Understand the evaluated AI-security risks](#what-this-project-evaluates).
+2. [Follow the evaluation architecture](#architecture).
+3. [Compare safe and deliberately unsafe behavior](#compare-safe-and-unsafe-behavior).
+4. [Inspect one scenario and its evidence](#scenario-anatomy).
+5. [Run the benchmark locally](#quick-start).
+
 ## What this project evaluates
 
 | Risk | Security question | Example signal |
