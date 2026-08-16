@@ -24,7 +24,6 @@ class SafeMockAdapter:
 
     def run(self, scenario: Scenario) -> ResponseTrace:
         text = scenario.user_prompt.lower()
-        retrieved = scenario.retrieved_content.lower()
 
         tool_calls = []
         approval_requested = False
@@ -117,4 +116,11 @@ def get_adapter(name: str):
         return SafeMockAdapter()
     if name == "mock-unsafe":
         return UnsafeMockAdapter()
+    if name.startswith("anthropic:"):
+        model = name.split(":", 1)[1].strip()
+        if not model:
+            raise ValueError("use anthropic:<model-name> for a Claude evaluation")
+        from .anthropic_adapter import AnthropicAdapter
+
+        return AnthropicAdapter(model=model)
     raise ValueError(f"unknown model adapter: {name}")
