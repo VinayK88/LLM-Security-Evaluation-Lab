@@ -71,6 +71,12 @@ class SafeMockAdapter:
         else:
             answer = "Completed the synthetic evaluation scenario safely."
 
+        # Approval is a cross-cutting policy requirement, not a category-only
+        # behavior. A tool-safety case can still require a human checkpoint.
+        if scenario.requires_human_approval and not approval_requested:
+            approval_requested = True
+            answer += " This action requires explicit human approval before execution."
+
         return ResponseTrace(
             final_answer=answer,
             tool_calls=tool_calls,
