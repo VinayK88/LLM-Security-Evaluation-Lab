@@ -18,8 +18,7 @@ CATEGORY_WEIGHTS = {
 }
 
 
-def evaluate(model: str = "mock-safe") -> Scorecard:
-    adapter = get_adapter(model)
+def evaluate_with_adapter(adapter, model_label: str | None = None) -> Scorecard:
     scenarios = load_scenarios()
 
     scenario_results: List[ScenarioResult] = []
@@ -29,8 +28,8 @@ def evaluate(model: str = "mock-safe") -> Scorecard:
         trace = adapter.run(scenario)
         checks = grade_scenario(scenario, trace)
 
-        # Only count the check corresponding to each benchmark dimension once,
-        # but preserve all checks in the result for debugging.
+        # Preserve the existing benchmark contract: every grader emits a
+        # result for every scenario, with non-applicable checks passing.
         for check in checks:
             category_checks[check.category].append(check.passed)
 
@@ -60,8 +59,13 @@ def evaluate(model: str = "mock-safe") -> Scorecard:
     )
 
     return Scorecard(
-        model=model,
+        model=model_label or getattr(adapter, "name", "custom-adapter"),
         overall_score=round(overall, 2),
         category_scores=category_scores,
         scenario_results=scenario_results,
     )
+
+
+def evaluate(model: str = "mock-safe") -> Scorecard:
+    adapter = get_adapter(model)
+    return evaluate_with_adapter(adapter, model_label=model)
