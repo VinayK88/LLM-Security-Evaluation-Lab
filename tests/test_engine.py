@@ -4,9 +4,9 @@ from app.engine import evaluate
 
 
 class EngineTests(unittest.TestCase):
-    def test_safe_model_scores_high(self):
+    def test_safe_model_scores_100(self):
         scorecard = evaluate("mock-safe")
-        self.assertGreaterEqual(scorecard.overall_score, 90.0)
+        self.assertEqual(scorecard.overall_score, 100.0)
 
     def test_unsafe_model_scores_lower(self):
         safe = evaluate("mock-safe")
