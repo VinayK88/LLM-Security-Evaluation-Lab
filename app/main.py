@@ -3,6 +3,7 @@ from __future__ import annotations
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse
 
+from .actor_safeguards import run_actor_benchmark
 from .dataset import load_scenarios
 from .engine import evaluate
 from .models import EvalRequest, Scorecard
@@ -10,8 +11,11 @@ from .models import EvalRequest, Scorecard
 
 app = FastAPI(
     title="LLM Security Evaluation Lab",
-    version="0.1.0",
-    description="Defensive evaluation framework for LLM and agentic application security.",
+    version="0.2.0",
+    description=(
+        "Defensive evaluation framework for LLM application security, "
+        "longitudinal actor-level misuse detection, and safeguards intervention science."
+    ),
 )
 
 _last_scorecard: Scorecard | None = None
@@ -34,10 +38,11 @@ def home():
 </head>
 <body>
   <h1>LLM Security Evaluation Lab</h1>
-  <p>Prompt injection · leakage · tool safety · hallucination · approval compliance</p>
+  <p>Prompt injection · leakage · tool safety · actor-level misuse · jailbreak severity · intervention evaluation</p>
 
   <button onclick="run('mock-safe')">Evaluate safe mock</button>
   <button onclick="run('mock-unsafe')">Evaluate unsafe mock</button>
+  <button onclick="runActors()">Run actor safeguards benchmark</button>
 
   <div id="score" class="score">—</div>
   <pre id="result">Run an evaluation to generate a scorecard.</pre>
@@ -51,6 +56,13 @@ async function run(model) {
   });
   const data = await r.json();
   document.getElementById('score').textContent = data.overall_score + '/100';
+  document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+}
+async function runActors() {
+  const r = await fetch('/actor-safeguards');
+  const data = await r.json();
+  const m = data.metrics;
+  document.getElementById('score').textContent = m.pre_harm_detection ? 'PRE-HARM' : 'MISSED';
   document.getElementById('result').textContent = JSON.stringify(data, null, 2);
 }
 </script>
@@ -67,6 +79,11 @@ def run_evaluation(req: EvalRequest):
         return _last_scorecard.model_dump()
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
+
+
+@app.get("/actor-safeguards")
+def actor_safeguards():
+    return run_actor_benchmark()
 
 
 @app.get("/scenarios")
