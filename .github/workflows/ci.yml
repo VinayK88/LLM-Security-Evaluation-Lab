@@ -1,0 +1,37 @@
+name: LLM Security Evaluation CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Run unit tests
+        run: python -m unittest discover -s tests -v
+      - name: Run safe baseline
+        run: python scripts/run_eval.py --model mock-safe --min-score 90
+      - name: Verify actor safeguards benchmark
+        run: |
+          python - <<'PY'
+          from app.actor_safeguards import run_actor_benchmark
+          result = run_actor_benchmark()
+          assert result["metrics"]["pre_harm_detection"]
+          assert not result["metrics"]["researcher_escalated"]
+          assert not result["metrics"]["benign_escalated"]
+          print(result["metrics"])
+          PY
+      - name: Compile application modules
+        run: python -m compileall -q app tests scripts
