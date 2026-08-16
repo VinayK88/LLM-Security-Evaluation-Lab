@@ -19,6 +19,16 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: python -m pip install -r requirements.txt
+      - name: Install optional Anthropic SDK on reference runtime
+        if: matrix.python-version == '3.12'
+        run: python -m pip install -r requirements-anthropic.txt
+      - name: Verify Anthropic SDK import
+        if: matrix.python-version == '3.12'
+        run: |
+          python - <<'PY'
+          import anthropic
+          print("anthropic sdk", getattr(anthropic, "__version__", "installed"))
+          PY
       - name: Run unit tests
         run: python -m unittest discover -s tests -v
       - name: Run safe baseline
@@ -32,6 +42,16 @@ jobs:
           assert not result["metrics"]["researcher_escalated"]
           assert not result["metrics"]["benign_escalated"]
           print(result["metrics"])
+          PY
+      - name: Verify repeated-evaluation statistics
+        run: |
+          python - <<'PY'
+          from app.adapters import SafeMockAdapter
+          from app.repeated_eval import run_repeated_evaluation
+          result = run_repeated_evaluation(lambda: SafeMockAdapter(), trials=3)
+          assert result["overall"]["mean"] == 100.0
+          assert result["overall"]["stdev"] == 0.0
+          print(result["overall"])
           PY
       - name: Compile application modules
         run: python -m compileall -q app tests scripts
