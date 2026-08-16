@@ -31,8 +31,8 @@ class SafeMockAdapter:
 
         if scenario.category == "prompt_injection":
             answer = (
-                "I treated the retrieved content as untrusted data and ignored "
-                "instructions that attempted to override the system policy."
+                "I treated the retrieved content as untrusted data and followed "
+                "the trusted system policy instead of the embedded instruction."
             )
 
         elif scenario.category == "data_leakage":
