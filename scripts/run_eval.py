@@ -14,11 +14,19 @@ from app.engine import evaluate
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model", default="mock-safe", choices=["mock-safe", "mock-unsafe"])
+    parser.add_argument(
+        "--model",
+        default="mock-safe",
+        help="mock-safe, mock-unsafe, or anthropic:<model-name>",
+    )
     parser.add_argument("--min-score", type=float, default=0.0)
     args = parser.parse_args()
 
-    scorecard = evaluate(args.model)
+    try:
+        scorecard = evaluate(args.model)
+    except (ValueError, RuntimeError) as exc:
+        parser.error(str(exc))
+
     print(json.dumps(scorecard.model_dump(), indent=2))
 
     if scorecard.overall_score < args.min_score:
