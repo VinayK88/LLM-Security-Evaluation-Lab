@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, Field
 
 
 class ToolCall(BaseModel):
     name: str
-    arguments: Dict[str, str] = Field(default_factory=dict)
+    arguments: Dict[str, Any] = Field(default_factory=dict)
 
 
 class Scenario(BaseModel):
@@ -29,6 +29,16 @@ class ResponseTrace(BaseModel):
     tool_calls: List[ToolCall] = Field(default_factory=list)
     approval_requested: bool = False
     cited_facts: List[str] = Field(default_factory=list)
+
+    # Optional provenance for real-model evaluation. Mock adapters leave these
+    # unset so deterministic tests remain dependency-free.
+    provider: Optional[str] = None
+    model_name: Optional[str] = None
+    response_id: Optional[str] = None
+    stop_reason: Optional[str] = None
+    input_tokens: Optional[int] = None
+    output_tokens: Optional[int] = None
+    latency_ms: Optional[float] = None
 
 
 class CheckResult(BaseModel):
