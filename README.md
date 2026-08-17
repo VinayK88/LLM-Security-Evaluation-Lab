@@ -18,6 +18,8 @@
 
 ---
 
+![LLM Security Evaluation Lab dashboard preview](assets/dashboard-preview.svg)
+
 LLM Security Evaluation Lab is a defensive evaluation platform for two related questions:
 
 > **Does a model or agent remain safe on a single interaction?**
